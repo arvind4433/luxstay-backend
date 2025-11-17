@@ -4,7 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 
 
-mongoose.connect("mongodb://127.0.0.1:27017/room-booking")
+mongoose.connect(process.env.MongoDB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("MongoDB Connected: room-booking"))
   .catch(err => console.log("DB Connection Error:", err));
 
