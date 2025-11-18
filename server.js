@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
 });
 
 
-const HOST = "127.0.0.1";
+const HOST = "0.0.0.0";
 const PORT = 5000;
 
 app.listen(PORT, HOST, () => {
