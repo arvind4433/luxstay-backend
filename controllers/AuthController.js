@@ -27,7 +27,6 @@ const register = async (req,res) => {
         email,
         password:hashPassword,
         name,
-        image
     })
     user.save()
     return res.json({
