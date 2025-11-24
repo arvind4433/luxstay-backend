@@ -5,7 +5,7 @@ const SendMail = require("../services/mail")
 const {OAuth2Client} = require("google-auth-library")
 
 const { google } = require('googleapis')
-const { generateOTP } = require("../utils/otpcontroller")
+const { generateOTP, VerifyOTP } = require("../utils/otpcontroller")
 
 const OAuthClient = new OAuth2Client(
      process.env.Google_Client_ID,
@@ -67,6 +67,33 @@ return res.json({
     })
 }
 
+const verifylogin  = async(req,res) => {
+    const {email, otp} = req.body;
+    var ExistUser = await User.findOne({email:email})
+      if(!ExistUser){
+        return res.json({
+                status: false,
+                message: "user not found"
+            })
+    }
+
+    const Verify= await VerifyOTP("login",otp,ExistUser._id);
+    if(!Verify.status){
+        return res.json({
+            status: false,
+            message: Verify.message
+        })
+    }
+
+    const token = await generateToken(ExistUser);
+
+    return res.json({
+        status: true,
+        message: "login success",
+        token: token
+    })
+
+}
 
 
 
