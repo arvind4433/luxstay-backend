@@ -2,11 +2,15 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
+require("dotenv").config();
 
 
-mongoose.connect(process.env.MongoDB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB Connected: room-booking"))
-  .catch(err => console.log("DB Connection Error:", err));
+mongoose.connect(process.env.MongoDB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error:"));
+db.on("open", () => {
+  console.log("Connected to MongoDB");
+});
 
 const app = express();
 
@@ -19,6 +23,8 @@ app.use(cors());
 const AuthRouter = require("./routes/AuthRoute"); 
 app.use("/auth", AuthRouter);
 
+const HotelRouter = require("./routes/hotelroutes"); 
+app.use("/hotel", HotelRouter); 
 
 app.get("/", (req, res) => {
   return res.json({ status: true, message: "API Server Working!" });

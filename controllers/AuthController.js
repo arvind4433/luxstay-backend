@@ -5,6 +5,7 @@ const SendMail = require("../services/mail")
 const {OAuth2Client} = require("google-auth-library")
 
 const { google } = require('googleapis')
+const { generateOTP } = require("../utils/otpcontroller")
 
 const OAuthClient = new OAuth2Client(
      process.env.Google_Client_ID,
@@ -49,16 +50,25 @@ const login = async(req,res) => {
       if(!ExistUsers){
         return res.json({
                 status: false,
-                message: "user not foundd"
+                message: "user not found"
             })
     }
- const token = await generateToken(ExistUser);
+ const code = await generateOTP("login",ExistUser._id);
+
+    const message = `<div>
+      <h2>Your OTP code is </h2>
+      <h1>${code}</h1>
+    </div>`
+    const mail = await SendMail(email,"Login OTP!", message)
+    console.log(mail)
 return res.json({
         status: true,
         message: "login success",
-        data : {token}
     })
 }
+
+
+
 
 const getUser = async(req,res) => {
     const {email} = req.user
