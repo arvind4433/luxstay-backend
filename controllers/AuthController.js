@@ -195,5 +195,6 @@ module.exports = UserController = {
     getUser,
     forgotPassword,
     updatePassword,
-    googleLogin
+    googleLogin,
+    verifylogin
 }
