@@ -14,7 +14,7 @@ app.use(cors());
 const HOST = process.env.HOST || "0.0.0.0";
 const PORT = process.env.PORT || 5000;
 
-const AuthRouter = require("./routes/AuthRoutes");
+const AuthRouter = require("./routes/AuthRoute");
 app.use("/auth", AuthRouter);
 
 const HotelRouter = require("./routes/HotelRoutes");
