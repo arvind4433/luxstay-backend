@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 5000;
 const AuthRouter = require("./routes/AuthRoute");
 app.use("/auth", AuthRouter);
 
-const HotelRouter = require("./routes/HotelRoutes");
+const HotelRouter = require("./routes/hotelroutes");
 app.use("/hotel", HotelRouter);
 
 app.get("/", (req, res) => {
