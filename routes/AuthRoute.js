@@ -8,7 +8,9 @@ router.post("/register", UserController.register);
 router.post("/login", UserController.login);
 router.get("/getUser", verifyToken, UserController.getUser);
 router.post("/forgot-password", UserController.forgotPassword);
-router.post("/reset-password", verifyToken, UserController.updatePassword);
+
+router.post("/verify-otp", UserController.verifyOTP);
+router.post("/updatePassword", verifyToken, UserController.updatePassword);
 router.post("/social/google", UserController.googleLogin);
 
 module.exports = router;

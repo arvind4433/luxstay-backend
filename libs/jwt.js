@@ -7,9 +7,9 @@ const generateToken = async (user) => {
     
 const verifyToken = async (req, res, next) => {
   try {
-    const token = req.headers.authorization;
+    const token = req.headers?.authorization ||  req.headers?.Authorization;
     if (!token) return res.status(401).json({ message: "No token provided" });
-    const decoded = jwt.verify(token, "secretjwtkey");
+    const decoded = jwt.verify(token, process.env.JWT_Secret);
     req.user = decoded;
     next();
   } catch {

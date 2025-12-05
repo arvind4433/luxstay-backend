@@ -95,6 +95,34 @@ const verifylogin  = async(req,res) => {
 
 }
 
+const verifyOTP  = async(req,res) => {
+    const {email, otp, type} = req.body;
+    var ExistUser = await User.findOne({email:email})
+      if(!ExistUser){
+        return res.json({
+                status: false,
+                message: "user not found"
+            })
+    }
+
+    const Verify= await VerifyOTP(type,otp,ExistUser._id);
+    if(!Verify.status){
+        return res.json({
+            status: false,
+            message: Verify.message
+        })
+    }
+
+    const token = await generateToken(ExistUser);
+
+    return res.json({
+        status: true,
+        message: "login success",
+        token: token
+    })
+
+}
+
 
 
 const getUser = async(req,res) => {
@@ -114,11 +142,11 @@ const getUser = async(req,res) => {
 }
 
 const updatePassword = async (req, res) => {
-  const {newPass} = req.body
+  const {newPassword} = req.body
     
     const decoded = req.user;
 
-    const hashPassword = await bcryptjs.hash(newPass,16)
+    const hashPassword = await bcryptjs.hash(newPassword,16)
     const user = User.findOneAndUpdate({
         email:decoded.email
     },{
@@ -140,11 +168,11 @@ const forgotPassword = async(req,res) => {
         message: "user not found"
     })
     }
-    const token = await generateToken(ExistUser);
+    const otp = await generateOTP("forgot",ExistUser._id);
 
     const message = `<div>
-      <h2>Please click on link </h2>
-      <a href="http://localhost:5173/auth/resetpassword/${token}">Reset Password</a>
+      <h2>Your 6 digit otp is : </h2>
+      <p>${otp}<p/>
     </div>`
 
     const mail = await SendMail(email,"Forgot Password!", message)
@@ -196,5 +224,6 @@ module.exports = UserController = {
     forgotPassword,
     updatePassword,
     googleLogin,
-    verifylogin
+    verifylogin,
+    verifyOTP
 }
