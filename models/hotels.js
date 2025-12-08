@@ -4,14 +4,17 @@ const HotelSchema = new mongoose.Schema({
     name:{
         type:String,
     },
-rooms:{
+description:{
     type:String
+},
+image: {
+    type: String
 },
 location:{
     type:String
 },
-availability:{
-    type:String
+amenities:{
+    type:Array
 
 },
 price:{

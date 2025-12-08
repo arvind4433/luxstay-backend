@@ -69,6 +69,8 @@ return res.json({
     })
 }
 
+
+
 const verifylogin  = async(req,res) => {
     const {email, otp} = req.body;
     var ExistUser = await User.findOne({email:email})
@@ -127,21 +129,31 @@ const verifyOTP  = async(req,res) => {
 
 
 
-const getUser = async(req,res) => {
-    const {email} = req.user
-  const ExistUser = await User.findOne({email:email}).select("-password")
-      if(!ExistUser){
- return res.json({
-        status: false,
-        message: "user not found"
-    })
+const getUser = async (req, res) => {
+    try {
+        const { email } = req.user;
+        const ExistUser = await User.findOne({ email: email }).select("-password");
+
+        if (!ExistUser) {
+            return res.status(404).json({
+                status: false,
+                message: "User not found"
+            });
+        }
+
+        return res.json({
+            status: true,
+            message: "User get success",
+            data: ExistUser
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: false,
+            message: "Internal Server Error"
+        });
     }
-    return res.json({
-        status: true,
-        message: "user get success",
-        data : ExistUser 
-    })
-}
+};
+
 
 const updatePassword = async (req, res) => {
   const {newPassword} = req.body
