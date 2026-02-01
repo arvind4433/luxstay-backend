@@ -1,4 +1,4 @@
-const otpModel = require("../models/otpModel");
+const otpModel = require("../models/OtpModel");
 const mailService = require("../services/mailer");
 
 const generateOTP = async (type, email) => {
