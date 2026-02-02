@@ -1,15 +1,25 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const app = express();
-const dotenv = require('dotenv');
-const connectDB = require('./database');
 const path = require("path");
 
-dotenv.config({});
+/**
+ * ✅ dotenv sirf local development ke liye
+ * Render production me env vars khud deta hai
+ */
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
+const app = express();
+
+const connectDB = require('./database');
 
 app.use(cors({
-  origin: ["https://luxstay-mocha.vercel.app", "https://www.bookmyhotelroom.online"],
+  origin: [
+    "https://luxstay-mocha.vercel.app",
+    "https://www.bookmyhotelroom.online"
+  ],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   credentials: true
 }));
@@ -25,6 +35,7 @@ app.get('/', (req, res) => {
   res.status(200).json({ message: 'API is working!' });
 });
 
+/* ===== Admin Routes ===== */
 const adminAuthRoutes = require('./routes/admin/adminRoutes');
 const adminUserRoutes = require('./routes/admin/userRoutes');
 const adminHotelRoutes = require('./routes/admin/hotelRoutes');
@@ -49,9 +60,9 @@ app.use('/api/room', roomRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/review', reviewRoutes);
-app.use('/api/user', adminUserRoutes);
 app.use('/api/notification', notificationsRouter);
 
+/* ===== User Routes ===== */
 const AuthRoutes = require('./routes/user/authRoutes');
 const UserRoutes = require('./routes/user/userRoutes');
 const HotelRoutes = require('./routes/user/hotelRoutes');
@@ -64,7 +75,7 @@ app.use('/api/payment', PaymentRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server is running`);
+  console.log(`Server is running on port ${PORT}`);
 });
 
 module.exports = app;
