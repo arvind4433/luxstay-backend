@@ -1,16 +1,37 @@
 const Room = require("../../models/Room");
 
-/**
- * GET /api/room?hotelId=xxx
- * GET /api/room/hotel/:hotelId
- */
 const getByHotel = async (req, res) => {
   try {
     const hotelId = req.params.hotelId || req.query.hotelId;
+    const { minPrice, maxPrice, roomType, availableOnly, sort } = req.query;
+
     if (!hotelId) {
       return res.status(400).json({ status: false, message: "Hotel ID is required" });
     }
-    const rooms = await Room.find({ hotelId }).lean();
+
+    const filter = { hotelId };
+    if (minPrice || maxPrice) {
+      filter.basePrice = {};
+      if (minPrice) filter.basePrice.$gte = Number(minPrice);
+      if (maxPrice) filter.basePrice.$lte = Number(maxPrice);
+    }
+    if (roomType) {
+      filter.roomTypeName = {
+        $in: String(roomType)
+          .split(",")
+          .map((value) => new RegExp(value.trim(), "i")),
+      };
+    }
+    if (availableOnly === "true") {
+      filter.availableRooms = { $gt: 0 };
+    }
+
+    let query = Room.find(filter);
+    if (sort === "price_asc") query = query.sort({ basePrice: 1 });
+    else if (sort === "price_desc") query = query.sort({ basePrice: -1 });
+    else if (sort === "size_desc") query = query.sort({ roomSize: -1 });
+
+    const rooms = await query.lean();
     return res.status(200).json({
       status: true,
       message: "Rooms fetched successfully",

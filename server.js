@@ -17,6 +17,7 @@ const connectDB = require("./database");
 const passport = require("./services/passport");
 
 const app = express();
+const useMockApi = !process.env.MONGO_URI;
 
 const allowedOrigins = [
   "http://localhost:5173",
@@ -115,7 +116,9 @@ app.use(passport.session());
 
 app.use(express.static(path.join(__dirname, "public")));
 
-connectDB();
+if (!useMockApi) {
+  connectDB();
+}
 
 // ========================
 // Health Check
@@ -124,55 +127,60 @@ app.get("/", (req, res) => {
   res.json({ message: "LuxStay API is running!", status: "ok", timestamp: new Date().toISOString() });
 });
 
-// ========================
-// Admin Routes
-// ========================
-const adminAuthRoutes = require("./routes/admin/adminRoutes");
-const adminUserRoutes = require("./routes/admin/userRoutes");
-const adminHotelRoutes = require("./routes/admin/hotelRoutes");
-const dashboardRoutes = require("./routes/admin/dashboardRoutes");
-const bookingRoutes = require("./routes/admin/bookingRoutes");
-const couponRoutes = require("./routes/admin/couponRoutes");
-const roomRoutes = require("./routes/admin/roomRoutes");
-const inventoryRoutes = require("./routes/admin/inventoryRoutes");
-const paymentRoutes = require("./routes/admin/paymentRoutes");
-const reviewRoutes = require("./routes/admin/reviewRoutes");
-const notificationsRouter = require("./routes/admin/notificationRoutes");
+if (useMockApi) {
+  const mockApiRoutes = require("./routes/mockApi");
+  app.use("/api", mockApiRoutes);
+} else {
+  // ========================
+  // Admin Routes
+  // ========================
+  const adminAuthRoutes = require("./routes/admin/adminRoutes");
+  const adminUserRoutes = require("./routes/admin/userRoutes");
+  const adminHotelRoutes = require("./routes/admin/hotelRoutes");
+  const dashboardRoutes = require("./routes/admin/dashboardRoutes");
+  const bookingRoutes = require("./routes/admin/bookingRoutes");
+  const couponRoutes = require("./routes/admin/couponRoutes");
+  const roomRoutes = require("./routes/admin/roomRoutes");
+  const inventoryRoutes = require("./routes/admin/inventoryRoutes");
+  const paymentRoutes = require("./routes/admin/paymentRoutes");
+  const reviewRoutes = require("./routes/admin/reviewRoutes");
+  const notificationsRouter = require("./routes/admin/notificationRoutes");
 
-app.use("/api/admin/auth", authLimiter, adminAuthRoutes);
-app.use("/api/admin/user", adminUserRoutes);
-app.use("/api/admin/hotel", adminHotelRoutes);
-app.use("/api/admin/dashboard", dashboardRoutes);
-app.use("/api/admin/booking", bookingRoutes);
-app.use("/api/admin/coupon", couponRoutes);
-app.use("/api/admin/room", roomRoutes);
-app.use("/api/admin/inventory", inventoryRoutes);
-app.use("/api/admin/payment", paymentRoutes);
-app.use("/api/admin/review", reviewRoutes);
-app.use("/api/admin/notification", notificationsRouter);
+  app.use("/api/admin/auth", authLimiter, adminAuthRoutes);
+  app.use("/api/admin/user", adminUserRoutes);
+  app.use("/api/admin/hotel", adminHotelRoutes);
+  app.use("/api/admin/dashboard", dashboardRoutes);
+  app.use("/api/admin/booking", bookingRoutes);
+  app.use("/api/admin/coupon", couponRoutes);
+  app.use("/api/admin/room", roomRoutes);
+  app.use("/api/admin/inventory", inventoryRoutes);
+  app.use("/api/admin/payment", paymentRoutes);
+  app.use("/api/admin/review", reviewRoutes);
+  app.use("/api/admin/notification", notificationsRouter);
 
-// ========================
-// User Routes
-// ========================
-const AuthRoutes = require("./routes/user/authRoutes");
-const UserRoutes = require("./routes/user/userRoutes");
-const HotelRoutes = require("./routes/user/hotelRoutes");
-const PaymentRoutes = require("./routes/user/paymentRoutes");
-const RoomRoutes = require("./routes/user/roomRoutes");
-const UserBookingRoutes = require("./routes/user/bookingRoutes");
-const UserReviewRoutes = require("./routes/user/reviewRoutes");
-const UserOfferRoutes = require("./routes/user/offerRoutes");
-const UserNotificationRoutes = require("./routes/user/notificationRoutes");
+  // ========================
+  // User Routes
+  // ========================
+  const AuthRoutes = require("./routes/user/authRoutes");
+  const UserRoutes = require("./routes/user/userRoutes");
+  const HotelRoutes = require("./routes/user/hotelRoutes");
+  const PaymentRoutes = require("./routes/user/paymentRoutes");
+  const RoomRoutes = require("./routes/user/roomRoutes");
+  const UserBookingRoutes = require("./routes/user/bookingRoutes");
+  const UserReviewRoutes = require("./routes/user/reviewRoutes");
+  const UserOfferRoutes = require("./routes/user/offerRoutes");
+  const UserNotificationRoutes = require("./routes/user/notificationRoutes");
 
-app.use("/api/auth", authLimiter, AuthRoutes);
-app.use("/api/user", UserRoutes);
-app.use("/api/hotel", HotelRoutes);
-app.use("/api/payment", PaymentRoutes);
-app.use("/api/room", RoomRoutes);
-app.use("/api/booking", UserBookingRoutes);
-app.use("/api/review", UserReviewRoutes);
-app.use("/api/offer", UserOfferRoutes);
-app.use("/api/notification", UserNotificationRoutes);
+  app.use("/api/auth", authLimiter, AuthRoutes);
+  app.use("/api/user", UserRoutes);
+  app.use("/api/hotel", HotelRoutes);
+  app.use("/api/payment", PaymentRoutes);
+  app.use("/api/room", RoomRoutes);
+  app.use("/api/booking", UserBookingRoutes);
+  app.use("/api/review", UserReviewRoutes);
+  app.use("/api/offer", UserOfferRoutes);
+  app.use("/api/notification", UserNotificationRoutes);
+}
 
 // ─── Seed Route (dev only) ────────────────────────────────
 const SeedRoute = require("./routes/seedRoute");

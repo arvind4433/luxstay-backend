@@ -16,13 +16,23 @@ router.post('/reset-password', AuthController.resetPassword);
 // OAuth Routes
 const redirectURL = process.env.NODE_ENV === "production" ? process.env.FRONTEND_URL : "http://localhost:5173";
 
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-router.get('/google/callback', passport.authenticate('google', { failureRedirect: redirectURL }), AuthController.socialAuthCallback);
+const ensureProvider = (provider) => (req, res, next) => {
+  if (!passport.enabledProviders?.includes(provider)) {
+    return res.status(503).json({
+      status: false,
+      message: `${provider} login is not configured on this server.`,
+    });
+  }
+  return next();
+};
 
-router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
-router.get('/facebook/callback', passport.authenticate('facebook', { failureRedirect: redirectURL }), AuthController.socialAuthCallback);
+router.get('/google', ensureProvider('google'), passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google/callback', ensureProvider('google'), passport.authenticate('google', { failureRedirect: redirectURL }), AuthController.socialAuthCallback);
 
-router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
-router.get('/github/callback', passport.authenticate('github', { failureRedirect: redirectURL }), AuthController.socialAuthCallback);
+router.get('/facebook', ensureProvider('facebook'), passport.authenticate('facebook', { scope: ['email'] }));
+router.get('/facebook/callback', ensureProvider('facebook'), passport.authenticate('facebook', { failureRedirect: redirectURL }), AuthController.socialAuthCallback);
+
+router.get('/github', ensureProvider('github'), passport.authenticate('github', { scope: ['user:email'] }));
+router.get('/github/callback', ensureProvider('github'), passport.authenticate('github', { failureRedirect: redirectURL }), AuthController.socialAuthCallback);
 
 module.exports = router;
